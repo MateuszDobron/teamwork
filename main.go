@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 
 	"log/slog"
 
@@ -32,18 +31,11 @@ func main() {
 		return
 	}
 	if *opts.outFile == "" {
-		printData(data)
+		data.PrintDomainCounts()
 	} else {
 		exporter := exporter.NewCustomerExporter(opts.outFile)
 		if saveErr := exporter.ExportData(data); saveErr != nil {
 			slog.Error("error saving domain data: ", saveErr)
 		}
-	}
-}
-
-func printData(data []customerimporter.DomainData) {
-	fmt.Println("domain,number_of_customers")
-	for _, v := range data {
-		fmt.Printf("%s,%v\n", v.Domain, v.CustomerQuantity)
 	}
 }

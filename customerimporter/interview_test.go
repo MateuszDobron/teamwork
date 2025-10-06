@@ -20,9 +20,9 @@ func TestImportDataSort(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	for i, v := range data {
-		if v.Domain != sortedDomains[i] {
-			t.Errorf("data not sorted properly. mismatch:\nhave: %v\nwant: %v", v.Domain, sortedDomains[i])
+	for i, v := range data.sortKeys() {
+		if v != sortedDomains[i] {
+			t.Errorf("data not sorted properly. mismatch:\nhave: %v\nwant: %v", v, sortedDomains[i])
 		}
 	}
 }

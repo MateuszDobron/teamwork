@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 
 	"github.com/MateuszDobron/teamwork/customerimporter"
 )
@@ -23,9 +22,9 @@ func NewCustomerExporter(outputPath *string) *CustomerExporter {
 
 // ExportData writes sorted customer domain data to a CSV file. If file already exists, it will
 // be truncated.
-func (ex CustomerExporter) ExportData(data []customerimporter.DomainData) error {
-	if data == nil {
-		return fmt.Errorf("error provided data is empty (nil)")
+func (ex CustomerExporter) ExportData(data customerimporter.DomainCounts) error {
+	if len(data.DomainMap) == 0 {
+		return fmt.Errorf("error provided data is empty 0 length")
 	}
 	outputFile, err := os.Create(*ex.outputPath)
 	if err != nil {
@@ -35,7 +34,7 @@ func (ex CustomerExporter) ExportData(data []customerimporter.DomainData) error 
 	return exportCsv(data, outputFile)
 }
 
-func exportCsv(data []customerimporter.DomainData, output io.Writer) error {
+func exportCsv(data customerimporter.DomainCounts, output io.Writer) error {
 	headers := []string{"domain", "number_of_customers"}
 	csvWriter := csv.NewWriter(output)
 	defer func() error {
@@ -48,11 +47,5 @@ func exportCsv(data []customerimporter.DomainData, output io.Writer) error {
 	if err := csvWriter.Write(headers); err != nil {
 		return err
 	}
-	for _, v := range data {
-		pair := []string{v.Domain, strconv.FormatUint(v.CustomerQuantity, 10)}
-		if err := csvWriter.Write(pair); err != nil {
-			return err
-		}
-	}
-	return nil
+	return data.CsvDomainCounts(csvWriter)
 }
