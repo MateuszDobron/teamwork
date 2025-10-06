@@ -24,7 +24,7 @@ func readOptions() *Options {
 
 func main() {
 	opts := readOptions()
-	importer := customerimporter.NewCustomerImporter(opts.path)
+	importer := customerimporter.NewCustomerImporter(*opts.path)
 	data, err := importer.ImportDomainData()
 	if err != nil {
 		slog.Error("error importing customer data: ", err)
