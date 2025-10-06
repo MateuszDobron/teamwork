@@ -4,7 +4,7 @@ import "testing"
 
 func TestImportData(t *testing.T) {
 	path := "./test_data.csv"
-	importer := NewCustomerImporter(&path)
+	importer := NewCustomerImporter(path)
 
 	_, err := importer.ImportDomainData()
 	if err != nil {
@@ -15,7 +15,7 @@ func TestImportData(t *testing.T) {
 func TestImportDataSort(t *testing.T) {
 	sortedDomains := []string{"360.cn", "acquirethisname.com", "blogtalkradio.com", "chicagotribune.com", "cnet.com", "cyberchimps.com", "github.io", "hubpages.com", "rediff.com", "statcounter.com"}
 	path := "./test_data.csv"
-	importer := NewCustomerImporter(&path)
+	importer := NewCustomerImporter(path)
 	data, err := importer.ImportDomainData()
 	if err != nil {
 		t.Error(err)
@@ -29,7 +29,7 @@ func TestImportDataSort(t *testing.T) {
 
 func TestImportInvalidPath(t *testing.T) {
 	path := ""
-	importer := NewCustomerImporter(&path)
+	importer := NewCustomerImporter(path)
 
 	_, err := importer.ImportDomainData()
 	if err == nil {
@@ -39,7 +39,7 @@ func TestImportInvalidPath(t *testing.T) {
 
 func TestImportInvalidData(t *testing.T) {
 	path := "./test_invalid_data.csv"
-	importer := NewCustomerImporter(&path)
+	importer := NewCustomerImporter(path)
 
 	_, err := importer.ImportDomainData()
 	if err == nil {
@@ -50,7 +50,7 @@ func TestImportInvalidData(t *testing.T) {
 func BenchmarkImportDomainData(b *testing.B) {
 	b.StopTimer()
 	path := "./benchmark10k.csv"
-	importer := NewCustomerImporter(&path)
+	importer := NewCustomerImporter(path)
 
 	b.StartTimer()
 	b.ReportAllocs()

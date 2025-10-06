@@ -17,7 +17,7 @@ func TestExportData(t *testing.T) {
 		"pinteres.uk":     10,
 		"yandex.ru":       43,
 	}
-	exporter := NewCustomerExporter(&path)
+	exporter := NewCustomerExporter(path)
 
 	err := exporter.ExportData(dc)
 	if err != nil {
@@ -27,7 +27,7 @@ func TestExportData(t *testing.T) {
 
 func TestExportInvalidPath(t *testing.T) {
 	path := ""
-	exporter := NewCustomerExporter(&path)
+	exporter := NewCustomerExporter(path)
 
 	err := exporter.ExportData(customerimporter.DomainCounts{})
 	if err == nil {
@@ -38,7 +38,7 @@ func TestExportInvalidPath(t *testing.T) {
 
 func TestExportEmptyData(t *testing.T) {
 	path := "./test_output.csv"
-	exporter := NewCustomerExporter(&path)
+	exporter := NewCustomerExporter(path)
 
 	err := exporter.ExportData(customerimporter.NewDomainCounts())
 	if err == nil {
@@ -52,12 +52,12 @@ func BenchmarkImportDomainData(b *testing.B) {
 	dir := b.TempDir()
 	path := fmt.Sprintf("%s/test_output.csv", dir)
 	dataPath := "../customerimporter/benchmark10k.csv"
-	importer := customerimporter.NewCustomerImporter(&dataPath)
+	importer := customerimporter.NewCustomerImporter(dataPath)
 	data, err := importer.ImportDomainData()
 	if err != nil {
 		b.Error(err)
 	}
-	exporter := NewCustomerExporter(&path)
+	exporter := NewCustomerExporter(path)
 
 	b.StartTimer()
 	b.ReportAllocs()

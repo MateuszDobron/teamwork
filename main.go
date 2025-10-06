@@ -24,7 +24,7 @@ func readOptions() *Options {
 
 func main() {
 	opts := readOptions()
-	importer := customerimporter.NewCustomerImporter(opts.path)
+	importer := customerimporter.NewCustomerImporter(*opts.path)
 	data, err := importer.ImportDomainData()
 	if err != nil {
 		slog.Error("error importing customer data: ", err)
@@ -33,7 +33,7 @@ func main() {
 	if *opts.outFile == "" {
 		data.PrintDomainCounts()
 	} else {
-		exporter := exporter.NewCustomerExporter(opts.outFile)
+		exporter := exporter.NewCustomerExporter(*opts.outFile)
 		if saveErr := exporter.ExportData(data); saveErr != nil {
 			slog.Error("error saving domain data: ", saveErr)
 		}
