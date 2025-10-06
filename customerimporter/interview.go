@@ -7,18 +7,49 @@
 package customerimporter
 
 import (
-	"cmp"
 	"encoding/csv"
 	"fmt"
 	"io"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 )
 
-type DomainData struct {
-	Domain           string
-	CustomerQuantity uint64
+type DomainCounts struct {
+	DomainMap map[string]uint64
+}
+
+func NewDomainCounts() DomainCounts {
+	return DomainCounts{
+		DomainMap: make(map[string]uint64),
+	}
+}
+
+func (dc DomainCounts) sortKeys() []string {
+	keys := make([]string, 0, len(dc.DomainMap))
+	for k := range dc.DomainMap {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+	return keys
+}
+
+func (dc DomainCounts) CsvDomainCounts(csvWriter *csv.Writer) error {
+	for _, key := range dc.sortKeys() {
+		pair := []string{key, strconv.FormatUint(dc.DomainMap[key], 10)}
+		if err := csvWriter.Write(pair); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (dc DomainCounts) PrintDomainCounts() {
+	fmt.Println("domain,number_of_customers")
+	for _, key := range dc.sortKeys() {
+		fmt.Printf("%s,%v\n", key, dc.DomainMap[key])
+	}
 }
 
 type CustomerImporter struct {
@@ -33,40 +64,30 @@ func NewCustomerImporter(filePath *string) *CustomerImporter {
 }
 
 // ImportDomainData reads and returns sorted customer domain data from CSV file.
-func (ci CustomerImporter) ImportDomainData() ([]DomainData, error) {
+func (ci CustomerImporter) ImportDomainData() (DomainCounts, error) {
 	file, err := os.Open(*ci.path)
 	if err != nil {
-		return nil, err
+		return DomainCounts{}, err
 	}
 	defer file.Close()
 	csvReader := csv.NewReader(file)
-	data := make(map[string]uint64)
+	domainCounts := NewDomainCounts()
 
 	// skip first line with headers
 	line, readErr := csvReader.Read()
 	if readErr != nil {
 		fmt.Println(line, readErr)
-		return nil, readErr
+		return DomainCounts{}, readErr
 	}
 	for line, readErr := csvReader.Read(); readErr != io.EOF; line, readErr = csvReader.Read() {
 		if readErr != nil {
-			return nil, readErr
+			return DomainCounts{}, readErr
 		}
 		email, domain, found := strings.Cut(line[2], "@")
 		if email == "" || !found {
-			return nil, fmt.Errorf("error invalid email address: %s", line[2])
+			return DomainCounts{}, fmt.Errorf("error invalid email address: %s", line[2])
 		}
-		data[domain] += 1
+		domainCounts.DomainMap[domain] += 1
 	}
-	domainData := make([]DomainData, 0, len(data))
-	for k, v := range data {
-		domainData = append(domainData, DomainData{
-			Domain:           k,
-			CustomerQuantity: v,
-		})
-	}
-	slices.SortFunc(domainData, func(l, r DomainData) int {
-		return cmp.Compare(l.Domain, r.Domain)
-	})
-	return domainData, nil
+	return domainCounts, nil
 }

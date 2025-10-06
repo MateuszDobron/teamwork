@@ -9,31 +9,17 @@ import (
 
 func TestExportData(t *testing.T) {
 	path := "./test_output.csv"
-	data := []customerimporter.DomainData{
-		{
-			Domain:           "livejournal.com",
-			CustomerQuantity: 12,
-		},
-		{
-			Domain:           "microsoft.com",
-			CustomerQuantity: 22,
-		},
-		{
-			Domain:           "newsvine.com",
-			CustomerQuantity: 15,
-		},
-		{
-			Domain:           "pinteres.uk",
-			CustomerQuantity: 10,
-		},
-		{
-			Domain:           "yandex.ru",
-			CustomerQuantity: 43,
-		},
+	dc := customerimporter.NewDomainCounts()
+	dc.DomainMap = map[string]uint64{
+		"livejournal.com": 12,
+		"microsoft.com":   22,
+		"newsvine.com":    15,
+		"pinteres.uk":     10,
+		"yandex.ru":       43,
 	}
 	exporter := NewCustomerExporter(&path)
 
-	err := exporter.ExportData(data)
+	err := exporter.ExportData(dc)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -43,7 +29,7 @@ func TestExportInvalidPath(t *testing.T) {
 	path := ""
 	exporter := NewCustomerExporter(&path)
 
-	err := exporter.ExportData([]customerimporter.DomainData{})
+	err := exporter.ExportData(customerimporter.DomainCounts{})
 	if err == nil {
 		t.Fatal(err)
 	}
@@ -54,7 +40,7 @@ func TestExportEmptyData(t *testing.T) {
 	path := "./test_output.csv"
 	exporter := NewCustomerExporter(&path)
 
-	err := exporter.ExportData(nil)
+	err := exporter.ExportData(customerimporter.NewDomainCounts())
 	if err == nil {
 		t.Fatal(err)
 	}
