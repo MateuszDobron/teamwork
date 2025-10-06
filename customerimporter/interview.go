@@ -36,8 +36,10 @@ func (dc DomainCounts) sortKeys() []string {
 }
 
 func (dc DomainCounts) CsvDomainCounts(csvWriter *csv.Writer) error {
+	pair := make([]string, 2)
 	for _, key := range dc.sortKeys() {
-		pair := []string{key, strconv.FormatUint(dc.DomainMap[key], 10)}
+		pair[0] = key
+		pair[1] = strconv.FormatUint(dc.DomainMap[key], 10)
 		if err := csvWriter.Write(pair); err != nil {
 			return err
 		}
@@ -71,6 +73,10 @@ func (ci CustomerImporter) ImportDomainData() (DomainCounts, error) {
 	}
 	defer file.Close()
 	csvReader := csv.NewReader(file)
+	// ReuseRecord avoids allocating a new []string for every row.
+	// The returned slice is overwritten on each Read.
+	csvReader.ReuseRecord = true
+
 	domainCounts := NewDomainCounts()
 
 	// skip first line with headers
@@ -83,11 +89,24 @@ func (ci CustomerImporter) ImportDomainData() (DomainCounts, error) {
 		if readErr != nil {
 			return DomainCounts{}, readErr
 		}
-		email, domain, found := strings.Cut(line[2], "@")
-		if email == "" || !found {
+		domain, ok := extractDomain(line[2])
+		if !ok {
 			return DomainCounts{}, fmt.Errorf("error invalid email address: %s", line[2])
 		}
 		domainCounts.DomainMap[domain] += 1
 	}
 	return domainCounts, nil
+}
+
+// extractDomain returns the domain part of an email.
+// It avoids allocating an extra substring for the not domain part.
+// Returns "" and false if invalid.
+func extractDomain(mail string) (string, bool) {
+	i := strings.IndexByte(mail, '@')
+	// i == -1 no '@'; i == 0 empty local; i == len(field)-1 empty domain
+	if i <= 0 || i+1 >= len(mail) {
+		return "", false
+	}
+	dom := mail[i+1:]
+	return dom, true
 }
