@@ -55,19 +55,19 @@ func (dc DomainCounts) PrintDomainCounts() {
 }
 
 type CustomerImporter struct {
-	path *string
+	path string
 }
 
 // NewCustomerImporter returns a new CustomerImporter that reads from file at specified path.
-func NewCustomerImporter(filePath *string) *CustomerImporter {
-	return &CustomerImporter{
+func NewCustomerImporter(filePath string) CustomerImporter {
+	return CustomerImporter{
 		path: filePath,
 	}
 }
 
 // ImportDomainData reads and returns sorted customer domain data from CSV file.
 func (ci CustomerImporter) ImportDomainData() (DomainCounts, error) {
-	file, err := os.Open(*ci.path)
+	file, err := os.Open(ci.path)
 	if err != nil {
 		return DomainCounts{}, err
 	}

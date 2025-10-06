@@ -52,7 +52,7 @@ func BenchmarkImportDomainData(b *testing.B) {
 	dir := b.TempDir()
 	path := fmt.Sprintf("%s/test_output.csv", dir)
 	dataPath := "../customerimporter/benchmark10k.csv"
-	importer := customerimporter.NewCustomerImporter(&dataPath)
+	importer := customerimporter.NewCustomerImporter(dataPath)
 	data, err := importer.ImportDomainData()
 	if err != nil {
 		b.Error(err)
