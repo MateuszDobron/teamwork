@@ -37,7 +37,7 @@ func TestExportInvalidPath(t *testing.T) {
 }
 
 func TestExportEmptyData(t *testing.T) {
-	path := "./test_output.csv"
+	path := "./testdata/test_output.csv"
 	exporter := NewCustomerExporter(path)
 
 	err := exporter.ExportData(customerimporter.NewDomainCounts())
@@ -51,7 +51,7 @@ func BenchmarkImportDomainData(b *testing.B) {
 	b.StopTimer()
 	dir := b.TempDir()
 	path := fmt.Sprintf("%s/test_output.csv", dir)
-	dataPath := "../customerimporter/benchmark10k.csv"
+	dataPath := "../customerimporter/testdata/benchmark10k.csv"
 	importer := customerimporter.NewCustomerImporter(dataPath)
 	data, err := importer.ImportDomainData()
 	if err != nil {
