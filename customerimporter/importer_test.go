@@ -3,7 +3,7 @@ package customerimporter
 import "testing"
 
 func TestImportData(t *testing.T) {
-	path := "./test_data.csv"
+	path := "./testdata/test_data.csv"
 	importer := NewCustomerImporter(path)
 
 	_, err := importer.ImportDomainData()
@@ -14,7 +14,7 @@ func TestImportData(t *testing.T) {
 
 func TestImportDataSort(t *testing.T) {
 	sortedDomains := []string{"360.cn", "acquirethisname.com", "blogtalkradio.com", "chicagotribune.com", "cnet.com", "cyberchimps.com", "github.io", "hubpages.com", "rediff.com", "statcounter.com"}
-	path := "./test_data.csv"
+	path := "./testdata/test_data.csv"
 	importer := NewCustomerImporter(path)
 	data, err := importer.ImportDomainData()
 	if err != nil {
@@ -38,7 +38,7 @@ func TestImportInvalidPath(t *testing.T) {
 }
 
 func TestImportInvalidData(t *testing.T) {
-	path := "./test_invalid_data.csv"
+	path := "./testdata/test_invalid_data.csv"
 	importer := NewCustomerImporter(path)
 
 	_, err := importer.ImportDomainData()
@@ -47,9 +47,32 @@ func TestImportInvalidData(t *testing.T) {
 	}
 }
 
+func TestExtractDomain(t *testing.T) {
+	tests := []struct {
+		in      string
+		wantDom string
+		wantOK  bool
+	}{
+		{"user@example.com", "example.com", true},
+		{"a@b", "b", true},
+		{"@example.com", "", false},    // empty local part
+		{"user@", "", false},           // empty domain
+		{"userexample.com", "", false}, // no '@'
+		{"", "", false},                // empty string
+	}
+
+	for _, tt := range tests {
+		got, ok := extractDomain(tt.in)
+		if got != tt.wantDom || ok != tt.wantOK {
+			t.Errorf("extractDomain(%q) = (%q,%v), want (%q,%v)",
+				tt.in, got, ok, tt.wantDom, tt.wantOK)
+		}
+	}
+}
+
 func BenchmarkImportDomainData(b *testing.B) {
 	b.StopTimer()
-	path := "./benchmark10k.csv"
+	path := "./testdata/benchmark10k.csv"
 	importer := NewCustomerImporter(path)
 
 	b.StartTimer()
