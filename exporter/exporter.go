@@ -24,11 +24,11 @@ func NewCustomerExporter(outputPath string) CustomerExporter {
 // be truncated.
 func (ex CustomerExporter) ExportData(data customerimporter.DomainCounts) error {
 	if len(data.DomainMap) == 0 {
-		return fmt.Errorf("error provided data is empty 0 length")
+		return fmt.Errorf("provided data is empty 0 length")
 	}
 	outputFile, err := os.Create(ex.outputPath)
 	if err != nil {
-		return fmt.Errorf("error creating new file for saving: %v", err)
+		return fmt.Errorf("creating new file for saving: %v at path: %s", err, ex.outputPath)
 	}
 	defer outputFile.Close()
 	return exportCsv(data, outputFile)

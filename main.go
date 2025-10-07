@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	"log/slog"
 
@@ -28,15 +29,16 @@ func main() {
 	importer := customerimporter.NewCustomerImporter(*opts.path)
 	data, err := importer.ImportDomainData()
 	if err != nil {
-		slog.Error("error importing customer data: ", err)
-		return
+		slog.Error("error importing customer data: ", slog.Any("err", err))
+		os.Exit(1)
 	}
 	if *opts.outFile == "" {
 		data.PrintDomainCounts()
 	} else {
 		exporter := exporter.NewCustomerExporter(*opts.outFile)
 		if saveErr := exporter.ExportData(data); saveErr != nil {
-			slog.Error("error saving domain data: ", saveErr)
+			slog.Error("error saving domain data: ", slog.Any("err", saveErr))
+			os.Exit(1)
 		}
 	}
 }
