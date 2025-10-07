@@ -34,18 +34,20 @@ func (ex CustomerExporter) ExportData(data customerimporter.DomainCounts) error 
 	return exportCsv(data, outputFile)
 }
 
-func exportCsv(data customerimporter.DomainCounts, output io.Writer) error {
+func exportCsv(data customerimporter.DomainCounts, output io.Writer) (err error) {
 	headers := []string{"domain", "number_of_customers"}
 	csvWriter := csv.NewWriter(output)
-	defer func() error {
+	defer func() {
 		csvWriter.Flush()
-		if err := csvWriter.Error(); err != nil {
-			return err
+		if ferr := csvWriter.Error(); err == nil && ferr != nil {
+			err = ferr
 		}
-		return nil
 	}()
-	if err := csvWriter.Write(headers); err != nil {
-		return err
+	if err = csvWriter.Write(headers); err != nil {
+		return
 	}
-	return data.CSVDomainCounts(csvWriter)
+	if err = data.CSVDomainCounts(csvWriter); err != nil {
+		return
+	}
+	return
 }
