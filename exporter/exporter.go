@@ -10,12 +10,12 @@ import (
 )
 
 type CustomerExporter struct {
-	outputPath *string
+	outputPath string
 }
 
 // NewCustomerExporter returns a new CustomerExporter that writes customer domain data to specified file.
-func NewCustomerExporter(outputPath *string) *CustomerExporter {
-	return &CustomerExporter{
+func NewCustomerExporter(outputPath string) CustomerExporter {
+	return CustomerExporter{
 		outputPath: outputPath,
 	}
 }
@@ -26,7 +26,7 @@ func (ex CustomerExporter) ExportData(data customerimporter.DomainCounts) error 
 	if len(data.DomainMap) == 0 {
 		return fmt.Errorf("error provided data is empty 0 length")
 	}
-	outputFile, err := os.Create(*ex.outputPath)
+	outputFile, err := os.Create(ex.outputPath)
 	if err != nil {
 		return fmt.Errorf("error creating new file for saving: %v", err)
 	}
