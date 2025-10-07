@@ -69,7 +69,7 @@ func NewCustomerImporter(filePath string) CustomerImporter {
 func (ci CustomerImporter) ImportDomainData() (DomainCounts, error) {
 	file, err := os.Open(ci.path)
 	if err != nil {
-		return DomainCounts{}, err
+		return DomainCounts{}, fmt.Errorf("improper path: %s caused: %v", ci.path, err)
 	}
 	defer file.Close()
 	csvReader := csv.NewReader(file)
@@ -82,8 +82,7 @@ func (ci CustomerImporter) ImportDomainData() (DomainCounts, error) {
 	// skip first line with headers
 	line, readErr := csvReader.Read()
 	if readErr != nil {
-		fmt.Println(line, readErr)
-		return DomainCounts{}, readErr
+		return DomainCounts{}, fmt.Errorf("invalid line: %s caused %v", line, readErr)
 	}
 	for line, readErr := csvReader.Read(); readErr != io.EOF; line, readErr = csvReader.Read() {
 		if readErr != nil {
@@ -91,7 +90,7 @@ func (ci CustomerImporter) ImportDomainData() (DomainCounts, error) {
 		}
 		domain, ok := extractDomain(line[2])
 		if !ok {
-			return DomainCounts{}, fmt.Errorf("error invalid email address: %s", line[2])
+			return DomainCounts{}, fmt.Errorf("invalid email address: %s", line[2])
 		}
 		domainCounts.DomainMap[domain] += 1
 	}
