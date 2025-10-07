@@ -1,12 +1,22 @@
-# Interview Task
+initial state benchmark results:
+import
+3915590 ns/op       1464166 B/op      20035 allocs/op
+export
+84287 ns/op	        4264 B/op	      4 allocs/op
 
-Package ```customerimporter``` reads from a CSV file and returns a sorted (data
-structure of your choice) of email domains along with the number of customers
-with e-mail addresses for each domain. 
+after refinement benchmark results:
+import
+3155526 ns/op	  652122 B/op	    10036 allocs/op
+export
+130630 ns/op	   12456 B/op	    5 allocs/op
 
-* Initialise a new git repository and commit your changes.
-* Fix/Extend the project so that it runs from the CLI and output the sorted domains to the terminal or to a file. 
-* Any errors should be logged and handled.
-* Tests should pass.
-* Performance matters (this is only ~3k lines, but could be 1m lines or run on a small machine).
-* You are free to refactor/create anything the demonstrates how you build code.
+
+sum comparison
+inital:
+3999877 ns/op   1468430 B/op    20039 allocs/op
+after:
+3286156 ns/op   664578 B/op     10041 allocs/op
+initial/after:
+1.217           2.209            1.995
+
+So the cli app is now ~20% faster and uses ~50% less memory
