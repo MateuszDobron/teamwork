@@ -8,7 +8,7 @@ import (
 )
 
 func TestExportData(t *testing.T) {
-	path := "./test_output.csv"
+	path := "./testdata/test_output.csv"
 	dc := customerimporter.NewDomainCounts()
 	dc.DomainMap = map[string]uint64{
 		"livejournal.com": 12,

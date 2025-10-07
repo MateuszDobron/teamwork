@@ -47,5 +47,5 @@ func exportCsv(data customerimporter.DomainCounts, output io.Writer) error {
 	if err := csvWriter.Write(headers); err != nil {
 		return err
 	}
-	return data.CsvDomainCounts(csvWriter)
+	return data.CSVDomainCounts(csvWriter)
 }
